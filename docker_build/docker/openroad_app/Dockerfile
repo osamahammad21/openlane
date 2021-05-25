@@ -124,18 +124,6 @@ RUN git submodule update --init --recursive
 COPY rails.patch /OpenROAD_10012020/
 RUN git apply rails.patch
 
-# COPY setup_local.patch /OpenROAD_10012020/src/OpenDB/src/swig/python
-# RUN cd /OpenROAD_10012020/src/OpenDB/src/swig/python && git apply setup_local.patch
-
-# COPY pdngen_export_subst.patch /OpenROAD_10012020/
-# RUN git apply pdngen_export_subst.patch
-
-# COPY ignore_obs_outside.patch /OpenROAD_10012020/
-# RUN git apply ignore_obs_outside.patch
-
-# COPY opendp-diamond-search.patch /OpenROAD_10012020/
-# RUN git apply opendp-diamond-search.patch
-
 # Build OpenROAD
 RUN mkdir build && mkdir -p /build/version && mkdir install
 RUN cd build && cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/install .. && make -j$(nproc)
@@ -143,10 +131,8 @@ RUN cd build && make install
 RUN cp -r build/install/bin /build/
 
 # OpenDB Python interface
-WORKDIR src/OpenDB
-RUN mkdir build && mkdir -p /build/version && mkdir install
-RUN cd build && cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=$(pwd)/install .. && make -j$(nproc) opendbpy
-RUN cp -r build/src/swig/python /build/OpenDB_python
+RUN cd build && make -j$(nproc) opendbpy
+RUN cp -r build/src/OpenDB/src/swig/python /build/OpenDB_python
 WORKDIR /OpenROAD_10012020/
 
 RUN date +"Build Timestamp: %Y-%m-%d_%H-%M-%S" > /build/version/openroad.version
